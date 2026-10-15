@@ -1,0 +1,2607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TaskCraft Studio —- Daily Task List Maker & Image Studio</title>
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-elevated: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-focus: #3b82f6;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --accent: #0284c7;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-serif: "Georgia", Cambria, "Times New Roman", Times, serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #090d16;
+      --bg-surface: #111827;
+      --bg-elevated: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --border-color: #374151;
+      --border-focus: #60a5fa;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --primary-light: #1e3a8a33;
+      --accent: #38bdf8;
+      --success-light: #064e3b33;
+      --warning-light: #78350f33;
+      --danger-light: #7f1d1d33;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(8px);
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .nav-container {
+      max-width: 1540px;
+      margin: 0 auto;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .brand-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      background: linear-gradient(135deg, var(--text-primary), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+      font-family: inherit;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--border-color);
+    }
+
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      filter: brightness(0.92);
+    }
+
+    .btn-ghost {
+      background-color: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      background-color: var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.78rem;
+    }
+
+    .btn-lg {
+      padding: 0.75rem 1.4rem;
+      font-size: 0.95rem;
+      border-radius: var(--radius-lg);
+    }
+
+    .btn-icon {
+      padding: 0.5rem;
+      border-radius: var(--radius-md);
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-icon:hover {
+      color: var(--text-primary);
+      background-color: var(--border-color);
+    }
+
+    /* Layout */
+    .app-container {
+      max-width: 1540px;
+      margin: 0 auto;
+      padding: 1.25rem;
+      display: grid;
+      grid-template-columns: minmax(360px, 540px) 1fr;
+      gap: 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    @media (max-width: 1024px) {
+      .app-container {
+        grid-template-columns: 1fr;
+        padding: 0.85rem;
+        gap: 1.25rem;
+      }
+    }
+
+    /* Mobile View Toggle Switch */
+    .mobile-tab-bar {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 0.25rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 1024px) {
+      .mobile-tab-bar {
+        display: grid;
+      }
+      .mobile-hide-editor {
+        display: none !important;
+      }
+      .mobile-hide-preview {
+        display: none !important;
+      }
+    }
+
+    .tab-btn {
+      padding: 0.55rem;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Card Panels */
+    .panel {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: var(--bg-surface);
+    }
+
+    .panel-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .panel-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Upload & Sync Dropzone Banner */
+    .upload-zone {
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1rem;
+      text-align: center;
+      background-color: var(--bg-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      pointer-events: none;
+    }
+
+    .upload-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background-color: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .upload-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      max-width: 320px;
+      line-height: 1.35;
+    }
+
+    .upload-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.5rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-full);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-top: 0.25rem;
+    }
+
+    /* Restore Banner Notification */
+    .restore-toast {
+      display: none;
+      padding: 0.75rem 1rem;
+      background: var(--success-light);
+      border: 1px solid var(--success);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 0.82rem;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .restore-toast.active {
+      display: flex;
+    }
+
+    /* Date & Focus Card */
+    .section-box {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .form-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .date-input-group {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .input-field {
+      padding: 0.55rem 0.8rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+
+    .input-field:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .date-chips {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .chip-btn {
+      padding: 0.25rem 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chip-btn:hover, .chip-btn.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Add Task Form */
+    .task-create-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.9rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .task-input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .task-meta-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .select-field {
+      padding: 0.4rem 0.65rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 0.78rem;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .select-field:focus {
+      border-color: var(--border-focus);
+    }
+
+    /* Task Items List */
+    .tasks-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding-top: 0.25rem;
+    }
+
+    .task-progress-bar {
+      height: 6px;
+      background: var(--border-color);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-top: 0.35rem;
+    }
+
+    .task-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #059669);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 0.25rem;
+      background: var(--bg-primary);
+      padding: 0.2rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .filter-btn {
+      padding: 0.2rem 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .task-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .task-list::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: var(--radius-full);
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.65rem 0.85rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .task-item:hover {
+      border-color: var(--border-focus);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .task-item.completed {
+      background: var(--bg-primary);
+      opacity: 0.82;
+    }
+
+    .task-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--text-muted);
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+      display: grid;
+      place-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .task-checkbox:checked {
+      background-color: var(--success);
+      border-color: var(--success);
+    }
+
+    .task-checkbox:checked::before {
+      content: "";
+      width: 10px;
+      height: 6px;
+      border-left: 2px solid white;
+      border-bottom: 2px solid white;
+      transform: rotate(-45deg) translate(1px, -1px);
+    }
+
+    .task-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 0;
+    }
+
+    .task-title-input {
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      font-weight: 500;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      outline: none;
+      padding: 0.1rem 0.25rem;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .task-title-input:focus {
+      background: var(--bg-primary);
+      border-color: var(--border-focus);
+    }
+
+    .task-item.completed .task-title-input {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-badges {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      text-transform: capitalize;
+    }
+
+    .badge-priority-high {
+      background: var(--danger-light);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .badge-priority-medium {
+      background: var(--warning-light);
+      color: #b45309;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .badge-priority-low {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .badge-category {
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
+    .badge-time {
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+    }
+
+    .task-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .task-item:hover .task-actions {
+      opacity: 1;
+    }
+
+    .task-action-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .task-action-btn:hover {
+      color: var(--text-primary);
+      background: var(--border-color);
+    }
+
+    .task-action-btn.btn-delete:hover {
+      color: var(--danger);
+      background: var(--danger-light);
+    }
+
+    .empty-tasks {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Style / Theme Customizer Toolbar */
+    .style-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      padding: 0.9rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    .theme-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+      gap: 0.4rem;
+    }
+
+    .theme-card {
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.5rem;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+
+    .theme-card.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* PREVIEW & GENERATION PANEL (RIGHT SIDE) */
+    .preview-panel {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .preview-controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+    }
+
+    .preview-viewport-wrapper {
+      flex: 1;
+      padding: 1.5rem;
+      background-color: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      min-height: 520px;
+    }
+
+    /* Photorealistic Sheet Preview (The Generated Page Frame) */
+    .sheet-frame-container {
+      width: 100%;
+      max-width: 580px;
+      transition: all 0.3s ease;
+    }
+
+    .sheet-canvas-preview {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: var(--radius-md);
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.15), 0 4px 10px -2px rgba(0, 0, 0, 0.08);
+      background: white;
+    }
+
+    /* Offscreen render canvas */
+    #renderCanvas {
+      display: none;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1.1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      pointer-events: auto;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-success {
+      border-left: 4px solid var(--success);
+    }
+
+    .toast-info {
+      border-left: 4px solid var(--primary);
+    }
+
+    .toast-warning {
+      border-left: 4px solid var(--warning);
+    }
+
+    /* Modal for Image Preview & Direct Download */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      animation: modalPop 0.25s ease;
+    }
+
+    @keyframes modalPop {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-body {
+      padding: 1.25rem;
+      overflow-y: auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .modal-image-preview {
+      max-width: 100%;
+      max-height: 55vh;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      background: var(--bg-primary);
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      header, .panel:first-child, .mobile-tab-bar, .preview-controls-bar, .nav-actions {
+        display: none !important;
+      }
+      .app-container {
+        display: block !important;
+        padding: 0 !important;
+      }
+      .panel {
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .preview-viewport-wrapper {
+        padding: 0 !important;
+        background: white !important;
+      }
+      .sheet-canvas-preview {
+        box-shadow: none !important;
+        width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"></path>
+            <path d="M7 7h.01"></path>
+            <path d="m9 13 2 2 4-4"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>TaskCraft Studio</h1>
+          <p>Daily Task List Maker & Editable Image Generator By Shray</p>
+        </div>
+      </a>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary btn-sm" id="btnLoadSample" title="Load sample daily task list">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+          Sample
+        </button>
+
+        <button class="btn btn-secondary btn-sm" id="btnResetList" title="Clear and start new list">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+          Reset
+        </button>
+
+        <button class="btn-icon" id="themeToggleBtn" title="Toggle Light/Dark Mode">
+          <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+        </button>
+
+        <button class="btn btn-primary" id="btnQuickExportNav" title="Generate and download image">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Generate Image
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Tab Navigation Bar -->
+  <div class="app-container" style="padding-top: 0.75rem; padding-bottom: 0;">
+    <div class="mobile-tab-bar">
+      <button class="tab-btn active" id="tabBtnEditor">1. Edit Tasks & Date</button>
+      <button class="tab-btn" id="tabBtnPreview">2. Page Preview & Export</button>
+    </div>
+  </div>
+
+  <!-- Main Dual-Pane Application Container -->
+  <main class="app-container">
+
+    <!-- LEFT COLUMN: TASK & DATE EDITOR -->
+    <div class="panel" id="editorPanel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Daily Task Workspace
+        </div>
+        <span class="badge badge-category" id="taskCountBadge">0 Tasks</span>
+      </div>
+
+      <div class="panel-body">
+
+        <!-- 1. UPLOAD PREVIOUSLY GENERATED PAGE DROPZONE -->
+        <div class="upload-zone" id="uploadDropZone" title="Click or drop any previously generated TaskCraft image to load and edit all its tasks!">
+          <input type="file" id="imageFileInput" accept="image/png,image/jpeg,image/webp">
+          <div class="upload-content">
+            <div class="upload-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            </div>
+            <div class="upload-title">Upload Previously Generated Task List</div>
+            <div class="upload-subtitle">Drag & drop or tap to load any previously generated page image. All tasks & date will be instantly restored for editing!</div>
+            <div class="upload-badge">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Auto-extracts tasks, priorities & date
+            </div>
+          </div>
+        </div>
+
+        <!-- Restore Notification Banner -->
+        <div class="restore-toast" id="restoreBanner">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--success);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span id="restoreBannerText">Restored tasks from previous page!</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="dismissRestoreBannerBtn" style="padding: 0.2rem 0.4rem;">✕</button>
+        </div>
+
+        <!-- 2. DATE SELECTOR & DAILY GOAL -->
+        <div class="section-box">
+          <div class="form-label">
+            <span>Date of Tasks</span>
+            <span id="formattedDateDisplay" style="color: var(--primary); font-weight: 600; text-transform: none;">Wednesday, Oct 14, 2026</span>
+          </div>
+          
+          <div class="date-input-group">
+            <input type="date" class="input-field" id="taskDateInput" style="max-width: 170px;">
+            <div class="date-chips">
+              <button class="chip-btn active" data-date="today">Today</button>
+              <button class="chip-btn" data-date="tomorrow">Tomorrow</button>
+              <button class="chip-btn" data-date="plus2">+2 Days</button>
+            </div>
+          </div>
+
+          <!-- Daily Focus / Goal -->
+          <div style="margin-top: 0.25rem;">
+            <div class="form-label" style="margin-bottom: 0.35rem;">Daily Focus / Top Objective (Optional)</div>
+            <input type="text" class="input-field" id="dailyFocusInput" placeholder="e.g. Complete client pitch presentation and cardio workout">
+          </div>
+        </div>
+
+        <!-- 3. ADD NEW TASK FORM -->
+        <div class="task-create-box">
+          <div class="form-label">Add New Daily Task</div>
+          <div class="task-input-row">
+            <input type="text" class="input-field" id="newTaskTitleInput" placeholder="What task do you need to get done?" autocomplete="off">
+            <button class="btn btn-primary" id="btnAddTask">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Add
+            </button>
+          </div>
+
+          <div class="task-meta-row">
+            <!-- Priority selector -->
+            <select class="select-field" id="newTaskPriority">
+              <option value="high">🔴 High Priority</option>
+              <option value="medium" selected>🟡 Medium Priority</option>
+              <option value="low">🔵 Low Priority</option>
+              <option value="none">⚪ Standard</option>
+            </select>
+
+            <!-- Category selector -->
+            <select class="select-field" id="newTaskCategory">
+              <option value="Work">💼 Work</option>
+              <option value="Personal">🏠 Personal</option>
+              <option value="Health">🏃 Health</option>
+              <option value="Learning">📚 Learning</option>
+              <option value="Finance">💰 Finance</option>
+              <option value="Urgent">⚡ Urgent</option>
+            </select>
+
+            <!-- Optional Time slot -->
+            <input type="text" class="select-field" id="newTaskTime" placeholder="Time (e.g. 09:30 AM)" style="max-width: 140px;">
+          </div>
+        </div>
+
+        <!-- 4. TASKS MANAGEMENT LIST -->
+        <div>
+          <div class="tasks-header">
+            <div>
+              <span style="font-size: 0.85rem; font-weight: 700;">Task List</span>
+              <span id="progressStatsText" style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 0.4rem;">0/0 completed (0%)</span>
+            </div>
+
+            <div class="filter-tabs">
+              <button class="filter-btn active" data-filter="all">All</button>
+              <button class="filter-btn" data-filter="active">Active</button>
+              <button class="filter-btn" data-filter="completed">Done</button>
+            </div>
+          </div>
+
+          <div class="task-progress-bar">
+            <div class="task-progress-fill" id="taskProgressBar"></div>
+          </div>
+
+          <div class="task-list" id="taskListContainer" style="margin-top: 0.75rem;">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+
+        <!-- 5. DAILY NOTES & REFLECTION -->
+        <div class="section-box">
+          <div class="form-label">
+            <span>Daily Notes & Reflection (Optional)</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 500;">Appears on exported sheet</span>
+          </div>
+          <textarea class="input-field" id="dailyNotesInput" rows="2" placeholder="Key takeaways, gratitude, or tomorrow's reminder..." style="resize: vertical;"></textarea>
+        </div>
+
+        <!-- 6. PAGE STYLE & THEME CUSTOMIZER -->
+        <div class="style-toolbar">
+          <div class="form-label">Page Theme & Aesthetics</div>
+          <div class="theme-picker-grid" id="themePickerGrid">
+            <div class="theme-card active" data-theme-name="nordic">🌿 Nordic Linen</div>
+            <div class="theme-card" data-theme-name="minimal">⚪ Clean Slate</div>
+            <div class="theme-card" data-theme-name="slate">💼 Executive Navy</div>
+            <div class="theme-card" data-theme-name="rose">🌸 Soft Rose</div>
+            <div class="theme-card" data-theme-name="obsidian">🌑 Obsidian Dark</div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; margin-top: 0.35rem; flex-wrap: wrap;">
+            <label style="font-size: 0.78rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer; color: var(--text-secondary);">
+              <input type="checkbox" id="optShowTimes" checked> Show Time Slots
+            </label>
+            <label style="font-size: 0.78rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer; color: var(--text-secondary);">
+              <input type="checkbox" id="optShowCategories" checked> Show Categories
+            </label>
+            <label style="font-size: 0.78rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer; color: var(--text-secondary);">
+              <input type="checkbox" id="optShowNotes" checked> Show Notes Box
+            </label>
+            <label style="font-size: 0.78rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer; color: var(--text-secondary);">
+              <input type="checkbox" id="optShowProgress" checked> Show Progress Bar
+            </label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: LIVE PAGE PREVIEW & HIGH-RES IMAGE GENERATION -->
+    <div class="panel preview-panel" id="previewPanel">
+      <div class="preview-controls-bar">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          <span style="font-size: 0.95rem; font-weight: 700;">Live Clean Page Preview</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-sm" id="btnCopyImage" title="Copy high-res image to clipboard">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Copy Image
+          </button>
+
+          <button class="btn btn-secondary btn-sm" id="btnPrintPage" title="Print or save as PDF">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print
+          </button>
+
+          <button class="btn btn-primary" id="btnDownloadImage">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download Page Image (.png)
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview Viewport -->
+      <div class="preview-viewport-wrapper">
+        <div class="sheet-frame-container">
+          <!-- Canvas where live rendered daily sheet is displayed -->
+          <canvas id="displayCanvas" class="sheet-canvas-preview"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Off-screen High-Resolution Render Canvas -->
+  <canvas id="renderCanvas" width="1400" height="1980"></canvas>
+
+  <!-- Success/Export Modal -->
+  <div class="modal-overlay" id="exportModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--success);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          Daily Task Page Image Generated!
+        </h3>
+        <button class="btn-icon" id="btnCloseModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); max-width: 480px;">
+          Your daily task page has been rendered in clean high resolution. All task data has been embedded directly into this image so you can re-upload and edit it anytime!
+        </p>
+        <img id="modalPreviewImg" class="modal-image-preview" alt="Generated Task Page">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnModalClose">Close</button>
+        <button class="btn btn-primary" id="btnModalDownload">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download PNG
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- APPLICATION CORE SCRIPT -->
+  <script>
+    (function() {
+      'use strict';
+
+      // --- APPLICATION STATE ---
+      let appState = {
+        date: getTodayDateString(),
+        focus: "Complete key priorities and maintain deep focus throughout the day",
+        notes: "Remember to drink water, take a walk after lunch, and review tomorrow's plan before signing off.",
+        theme: "nordic",
+        options: {
+          showTimes: true,
+          showCategories: true,
+          showNotes: true,
+          showProgress: true
+        },
+        currentFilter: "all",
+        tasks: [
+          { id: "t1", title: "Review product roadmap and sprint deliverables", priority: "high", category: "Work", time: "09:00 AM", completed: true },
+          { id: "t2", title: "Conduct quarterly strategy sync with engineering team", priority: "high", category: "Work", time: "11:00 AM", completed: true },
+          { id: "t3", title: "Prepare daily task list and organize image assets", priority: "medium", category: "Work", time: "02:00 PM", completed: false },
+          { id: "t4", title: "45-minute aerobic workout & mobility stretches", priority: "medium", category: "Health", time: "05:30 PM", completed: false },
+          { id: "t5", title: "Read 20 pages of system design handbook", priority: "low", category: "Learning", time: "08:30 PM", completed: false }
+        ]
+      };
+
+      // --- THEME PALETTES FOR RENDER ENGINE ---
+      const THEMES = {
+        nordic: {
+          name: "Nordic Linen",
+          pageBg: "#FAF8F5",
+          cardBg: "#FFFFFF",
+          cardBorder: "#EFECE6",
+          accent: "#2D2825",
+          accentSecondary: "#5B7B68",
+          textPrimary: "#1F1C1A",
+          textSecondary: "#6E6864",
+          textMuted: "#A39E99",
+          lineColor: "#E8E4DD",
+          tagBg: "#F2EFEB",
+          highPriority: "#C84B31",
+          medPriority: "#D9822B",
+          lowPriority: "#4A7C59",
+          focusBg: "#F4F0E8",
+          focusBorder: "#D8CEBE"
+        },
+        minimal: {
+          name: "Clean Slate",
+          pageBg: "#FFFFFF",
+          cardBg: "#FAFAFA",
+          cardBorder: "#E5E5E5",
+          accent: "#0A0A0A",
+          accentSecondary: "#525252",
+          textPrimary: "#171717",
+          textSecondary: "#525252",
+          textMuted: "#A3A3A3",
+          lineColor: "#E5E5E5",
+          tagBg: "#F5F5F5",
+          highPriority: "#DC2626",
+          medPriority: "#D97706",
+          lowPriority: "#2563EB",
+          focusBg: "#F9F9F9",
+          focusBorder: "#E5E5E5"
+        },
+        slate: {
+          name: "Executive Navy",
+          pageBg: "#F8FAFC",
+          cardBg: "#FFFFFF",
+          cardBorder: "#E2E8F0",
+          accent: "#0F172A",
+          accentSecondary: "#2563EB",
+          textPrimary: "#0F172A",
+          textSecondary: "#475569",
+          textMuted: "#94A3B8",
+          lineColor: "#E2E8F0",
+          tagBg: "#F1F5F9",
+          highPriority: "#EF4444",
+          medPriority: "#F59E0B",
+          lowPriority: "#3B82F6",
+          focusBg: "#EFF6FF",
+          focusBorder: "#BFDBFE"
+        },
+        rose: {
+          name: "Soft Rose",
+          pageBg: "#FFFBFB",
+          cardBg: "#FFFFFF",
+          cardBorder: "#FCE7E7",
+          accent: "#881337",
+          accentSecondary: "#BE123C",
+          textPrimary: "#4C0519",
+          textSecondary: "#832729",
+          textMuted: "#BE8488",
+          lineColor: "#FCE7E7",
+          tagBg: "#FFF1F2",
+          highPriority: "#E11D48",
+          medPriority: "#D97706",
+          lowPriority: "#0D9488",
+          focusBg: "#FFF5F5",
+          focusBorder: "#FECDD3"
+        },
+        obsidian: {
+          name: "Obsidian Dark",
+          pageBg: "#12141A",
+          cardBg: "#1A1D24",
+          cardBorder: "#2A2E39",
+          accent: "#60A5FA",
+          accentSecondary: "#34D399",
+          textPrimary: "#F3F4F6",
+          textSecondary: "#9CA3AF",
+          textMuted: "#6B7280",
+          lineColor: "#262A34",
+          tagBg: "#222630",
+          highPriority: "#F87171",
+          medPriority: "#FBBF24",
+          lowPriority: "#60A5FA",
+          focusBg: "#1E232E",
+          focusBorder: "#384152"
+        }
+      };
+
+      // --- DOM ELEMENT REFERENCES ---
+      const elements = {
+        taskDateInput: document.getElementById('taskDateInput'),
+        formattedDateDisplay: document.getElementById('formattedDateDisplay'),
+        dailyFocusInput: document.getElementById('dailyFocusInput'),
+        dailyNotesInput: document.getElementById('dailyNotesInput'),
+        newTaskTitleInput: document.getElementById('newTaskTitleInput'),
+        newTaskPriority: document.getElementById('newTaskPriority'),
+        newTaskCategory: document.getElementById('newTaskCategory'),
+        newTaskTime: document.getElementById('newTaskTime'),
+        btnAddTask: document.getElementById('btnAddTask'),
+        taskListContainer: document.getElementById('taskListContainer'),
+        taskCountBadge: document.getElementById('taskCountBadge'),
+        progressStatsText: document.getElementById('progressStatsText'),
+        taskProgressBar: document.getElementById('taskProgressBar'),
+        uploadDropZone: document.getElementById('uploadDropZone'),
+        imageFileInput: document.getElementById('imageFileInput'),
+        restoreBanner: document.getElementById('restoreBanner'),
+        restoreBannerText: document.getElementById('restoreBannerText'),
+        dismissRestoreBannerBtn: document.getElementById('dismissRestoreBannerBtn'),
+        themePickerGrid: document.getElementById('themePickerGrid'),
+        optShowTimes: document.getElementById('optShowTimes'),
+        optShowCategories: document.getElementById('optShowCategories'),
+        optShowNotes: document.getElementById('optShowNotes'),
+        optShowProgress: document.getElementById('optShowProgress'),
+        displayCanvas: document.getElementById('displayCanvas'),
+        renderCanvas: document.getElementById('renderCanvas'),
+        btnDownloadImage: document.getElementById('btnDownloadImage'),
+        btnQuickExportNav: document.getElementById('btnQuickExportNav'),
+        btnCopyImage: document.getElementById('btnCopyImage'),
+        btnPrintPage: document.getElementById('btnPrintPage'),
+        btnLoadSample: document.getElementById('btnLoadSample'),
+        btnResetList: document.getElementById('btnResetList'),
+        themeToggleBtn: document.getElementById('themeToggleBtn'),
+        toastContainer: document.getElementById('toastContainer'),
+        exportModal: document.getElementById('exportModal'),
+        modalPreviewImg: document.getElementById('modalPreviewImg'),
+        btnCloseModal: document.getElementById('btnCloseModal'),
+        btnModalClose: document.getElementById('btnModalClose'),
+        btnModalDownload: document.getElementById('btnModalDownload'),
+        tabBtnEditor: document.getElementById('tabBtnEditor'),
+        tabBtnPreview: document.getElementById('tabBtnPreview'),
+        editorPanel: document.getElementById('editorPanel'),
+        previewPanel: document.getElementById('previewPanel')
+      };
+
+      // --- DATE UTILITY FUNCTIONS ---
+      function getTodayDateString() {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return year + '-' + month + '-' + day;
+      }
+
+      function formatDateClean(dateStr) {
+        if (!dateStr) return "Today's Tasks";
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+          const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+          if (!isNaN(d.getTime())) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return d.toLocaleDateString('en-US', options);
+          }
+        }
+        return dateStr;
+      }
+
+      function formatShortDate(dateStr) {
+        if (!dateStr) return "";
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+          const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+          if (!isNaN(d.getTime())) {
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          }
+        }
+        return dateStr;
+      }
+
+      // --- INITIALIZATION ---
+      function init() {
+        loadPersistedState();
+        setupEventListeners();
+        renderAll();
+      }
+
+      function loadPersistedState() {
+        try {
+          const saved = localStorage.getItem('taskcraft_app_state_v1');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed && Array.isArray(parsed.tasks)) {
+              appState = Object.assign({}, appState, parsed);
+            }
+          }
+        } catch (e) {
+          console.warn('Could not load saved state', e);
+        }
+      }
+
+      function persistState() {
+        try {
+          localStorage.setItem('taskcraft_app_state_v1', JSON.stringify(appState));
+        } catch (e) {
+          console.warn('Could not save state', e);
+        }
+      }
+
+      // --- TOAST NOTIFICATIONS ---
+      function showToast(message, type) {
+        type = type || 'info';
+        const toast = document.createElement('div');
+        toast.className = 'toast toast-' + type;
+        
+        let iconSvg = '';
+        if (type === 'success') {
+          iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--success)"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        } else if (type === 'warning') {
+          iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--warning)"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+        } else {
+          iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--primary)"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+        }
+
+        toast.innerHTML = iconSvg + '<span>' + message + '</span>';
+        elements.toastContainer.appendChild(toast);
+
+        setTimeout(function() { toast.classList.add('show'); }, 10);
+        setTimeout(function() {
+          toast.classList.remove('show');
+          setTimeout(function() { toast.remove(); }, 300);
+        }, 3600);
+      }
+
+      // --- UI RENDERING & EVENT HANDLERS ---
+      function renderAll() {
+        // Sync Inputs
+        elements.taskDateInput.value = appState.date;
+        elements.formattedDateDisplay.textContent = formatDateClean(appState.date);
+        elements.dailyFocusInput.value = appState.focus || '';
+        elements.dailyNotesInput.value = appState.notes || '';
+
+        // Sync Checkbox options
+        elements.optShowTimes.checked = appState.options.showTimes;
+        elements.optShowCategories.checked = appState.options.showCategories;
+        elements.optShowNotes.checked = appState.options.showNotes;
+        elements.optShowProgress.checked = appState.options.showProgress;
+
+        // Sync Theme buttons
+        document.querySelectorAll('.theme-card').forEach(function(card) {
+          card.classList.toggle('active', card.dataset.themeName === appState.theme);
+        });
+
+        // Render Task List
+        renderTaskList();
+
+        // Render Canvas Preview
+        renderPageCanvas();
+
+        // Persist
+        persistState();
+      }
+
+      function renderTaskList() {
+        const total = appState.tasks.length;
+        const completed = appState.tasks.filter(function(t) { return t.completed; }).length;
+        const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+        elements.taskCountBadge.textContent = total + ' Task' + (total === 1 ? '' : 's');
+        elements.progressStatsText.textContent = completed + '/' + total + ' completed (' + pct + '%)';
+        elements.taskProgressBar.style.width = pct + '%';
+
+        // Filter tasks
+        const filter = appState.currentFilter;
+        const visibleTasks = appState.tasks.filter(function(t) {
+          if (filter === 'active') return !t.completed;
+          if (filter === 'completed') return t.completed;
+          return true;
+        });
+
+        if (visibleTasks.length === 0) {
+          elements.taskListContainer.innerHTML = '<div class="empty-tasks">' +
+            '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>' +
+            '<span>' + (total === 0 ? 'No tasks added yet. Type a task above to begin!' : 'No tasks in this view filter.') + '</span>' +
+          '</div>';
+          return;
+        }
+
+        elements.taskListContainer.innerHTML = '';
+        visibleTasks.forEach(function(task) {
+          const item = document.createElement('div');
+          item.className = 'task-item ' + (task.completed ? 'completed' : '');
+          item.dataset.id = task.id;
+
+          let priorityClass = 'badge-priority-low';
+          let priorityLabel = 'Low';
+          if (task.priority === 'high') { priorityClass = 'badge-priority-high'; priorityLabel = 'High'; }
+          else if (task.priority === 'medium') { priorityClass = 'badge-priority-medium'; priorityLabel = 'Medium'; }
+          else if (task.priority === 'none') { priorityClass = 'badge-category'; priorityLabel = 'Normal'; }
+
+          item.innerHTML = 
+            '<input type="checkbox" class="task-checkbox" ' + (task.completed ? 'checked' : '') + ' title="Toggle completed">' +
+            '<div class="task-content">' +
+              '<input type="text" class="task-title-input" value="' + escapeHtml(task.title) + '" title="Click to edit task title">' +
+              '<div class="task-badges">' +
+                '<span class="badge ' + priorityClass + '">' + priorityLabel + '</span>' +
+                (task.category ? '<span class="badge badge-category">' + escapeHtml(task.category) + '</span>' : '') +
+                (task.time ? '<span class="badge badge-time">⏰ ' + escapeHtml(task.time) + '</span>' : '') +
+              '</div>' +
+            '</div>' +
+            '<div class="task-actions">' +
+              '<button class="task-action-btn btn-up" title="Move up">▲</button>' +
+              '<button class="task-action-btn btn-down" title="Move down">▼</button>' +
+              '<button class="task-action-btn btn-delete" title="Delete task">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>' +
+              '</button>' +
+            '</div>';
+
+          // Event: Checkbox
+          const chk = item.querySelector('.task-checkbox');
+          chk.addEventListener('change', function() {
+            task.completed = chk.checked;
+            renderAll();
+          });
+
+          // Event: Title edit
+          const titleInput = item.querySelector('.task-title-input');
+          titleInput.addEventListener('change', function() {
+            task.title = titleInput.value.trim() || 'Untitled Task';
+            renderAll();
+          });
+          titleInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              titleInput.blur();
+            }
+          });
+
+          // Event: Move Up
+          item.querySelector('.btn-up').addEventListener('click', function() {
+            const actualIdx = appState.tasks.findIndex(function(t) { return t.id === task.id; });
+            if (actualIdx > 0) {
+              const temp = appState.tasks[actualIdx];
+              appState.tasks[actualIdx] = appState.tasks[actualIdx - 1];
+              appState.tasks[actualIdx - 1] = temp;
+              renderAll();
+            }
+          });
+
+          // Event: Move Down
+          item.querySelector('.btn-down').addEventListener('click', function() {
+            const actualIdx = appState.tasks.findIndex(function(t) { return t.id === task.id; });
+            if (actualIdx < appState.tasks.length - 1) {
+              const temp = appState.tasks[actualIdx];
+              appState.tasks[actualIdx] = appState.tasks[actualIdx + 1];
+              appState.tasks[actualIdx + 1] = temp;
+              renderAll();
+            }
+          });
+
+          // Event: Delete
+          item.querySelector('.btn-delete').addEventListener('click', function() {
+            appState.tasks = appState.tasks.filter(function(t) { return t.id !== task.id; });
+            showToast('Task removed', 'info');
+            renderAll();
+          });
+
+          elements.taskListContainer.appendChild(item);
+        });
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      }
+
+      // --- CANVAS DRAWING ENGINE (HIGH-RES CLEAN SHEET GENERATOR) ---
+      function renderPageCanvas() {
+        const renderC = elements.renderCanvas;
+        const displayC = elements.displayCanvas;
+        
+        // High-Resolution Dimensions (2x Retina scale: 1400 x 1980 px)
+        const W = 1400;
+        const H = 1980;
+        renderC.width = W;
+        renderC.height = H;
+
+        const ctx = renderC.getContext('2d');
+        const theme = THEMES[appState.theme] || THEMES.nordic;
+
+        // 1. Draw Page Background
+        ctx.fillStyle = theme.pageBg;
+        ctx.fillRect(0, 0, W, H);
+
+        // 2. Subtle Grid / Dot Background Texture
+        ctx.fillStyle = theme.lineColor;
+        const dotSpacing = 28;
+        for (let x = 30; x < W - 30; x += dotSpacing) {
+          for (let y = 30; y < H - 30; y += dotSpacing) {
+            if ((x / dotSpacing + y / dotSpacing) % 2 === 0) {
+              ctx.beginPath();
+              ctx.arc(x, y, 1, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+
+        // 3. Main Sheet Card Container
+        const marginX = 80;
+        const marginY = 80;
+        const contentW = W - marginX * 2;
+        const contentH = H - marginY * 2;
+
+        // Sheet Card Background
+        ctx.fillStyle = theme.cardBg;
+        ctx.strokeStyle = theme.cardBorder;
+        ctx.lineWidth = 2;
+        drawRoundedRect(ctx, marginX, marginY, contentW, contentH, 24, true, true);
+
+        // Header Top Accent Stripe
+        ctx.fillStyle = theme.accent;
+        drawRoundedRectTop(ctx, marginX, marginY, contentW, 14, 24);
+
+        let curY = marginY + 54;
+
+        // 4. Header Section: Title & Date
+        const dateFormatted = formatDateClean(appState.date);
+        
+        // Subheader
+        ctx.font = '700 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillStyle = theme.textMuted;
+        ctx.fillText("DAILY TASK PLANNER", marginX + 50, curY);
+
+        // Main Date Headline
+        curY += 46;
+        ctx.font = '700 38px "Georgia", Cambria, serif';
+        ctx.fillStyle = theme.textPrimary;
+        ctx.fillText(dateFormatted, marginX + 50, curY);
+
+        // Right side badge: Task Completion summary
+        const total = appState.tasks.length;
+        const done = appState.tasks.filter(function(t) { return t.completed; }).length;
+        const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+        const badgeText = done + ' OF ' + total + ' COMPLETED (' + pct + '%)';
+        ctx.font = '700 14px -apple-system, BlinkMacSystemFont, sans-serif';
+        const badgeW = ctx.measureText(badgeText).width + 32;
+        const badgeX = marginX + contentW - 50 - badgeW;
+        const badgeY = curY - 34;
+
+        ctx.fillStyle = theme.tagBg;
+        ctx.strokeStyle = theme.cardBorder;
+        ctx.lineWidth = 1.5;
+        drawRoundedRect(ctx, badgeX, badgeY, badgeW, 36, 18, true, true);
+
+        ctx.fillStyle = theme.accentSecondary;
+        ctx.fillText(badgeText, badgeX + 16, badgeY + 23);
+
+        // Divider Line
+        curY += 28;
+        ctx.strokeStyle = theme.lineColor;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(marginX + 50, curY);
+        ctx.lineTo(marginX + contentW - 50, curY);
+        ctx.stroke();
+
+        // 5. Daily Focus Box (If Provided)
+        curY += 28;
+        if (appState.focus && appState.focus.trim().length > 0) {
+          const focusH = 68;
+          ctx.fillStyle = theme.focusBg;
+          ctx.strokeStyle = theme.focusBorder;
+          ctx.lineWidth = 1.5;
+          drawRoundedRect(ctx, marginX + 50, curY, contentW - 100, focusH, 12, true, true);
+
+          ctx.font = '700 13px -apple-system, BlinkMacSystemFont, sans-serif';
+          ctx.fillStyle = theme.accentSecondary;
+          ctx.fillText("✦ TODAY'S FOCUS:", marginX + 70, curY + 28);
+
+          ctx.font = '500 18px "Georgia", serif';
+          ctx.fillStyle = theme.textPrimary;
+          const focusText = truncateText(ctx, '"' + appState.focus.trim() + '"', contentW - 270);
+          ctx.fillText(focusText, marginX + 215, curY + 42);
+
+          curY += focusH + 28;
+        }
+
+        // 6. Progress Meter Bar (If Enabled)
+        if (appState.options.showProgress) {
+          const barH = 10;
+          const barW = contentW - 100;
+          ctx.fillStyle = theme.lineColor;
+          drawRoundedRect(ctx, marginX + 50, curY, barW, barH, 5, true, false);
+
+          if (pct > 0) {
+            const fillW = Math.max(12, (barW * pct) / 100);
+            ctx.fillStyle = theme.accentSecondary;
+            drawRoundedRect(ctx, marginX + 50, curY, fillW, barH, 5, true, false);
+          }
+          curY += barH + 32;
+        }
+
+        // 7. Tasks Table Header
+        ctx.font = '700 14px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillStyle = theme.textMuted;
+        ctx.fillText("STATUS", marginX + 60, curY);
+        if (appState.options.showTimes) {
+          ctx.fillText("TIME", marginX + 140, curY);
+        }
+        ctx.fillText("DAILY TASKS & PRIORITIES", marginX + (appState.options.showTimes ? 260 : 140), curY);
+        ctx.fillText("CATEGORY", marginX + contentW - 180, curY);
+
+        curY += 14;
+        ctx.strokeStyle = theme.lineColor;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(marginX + 50, curY);
+        ctx.lineTo(marginX + contentW - 50, curY);
+        ctx.stroke();
+
+        curY += 20;
+
+        // 8. Draw Tasks Rows
+        const maxTasksToShow = 14;
+        const rowH = 58;
+        const tasksToDraw = appState.tasks.slice(0, maxTasksToShow);
+
+        if (tasksToDraw.length === 0) {
+          ctx.font = 'italic 18px "Georgia", serif';
+          ctx.fillStyle = theme.textMuted;
+          ctx.fillText("No tasks recorded for this date. Upload a previous sheet or add tasks to generate.", marginX + 60, curY + 40);
+          curY += 100;
+        } else {
+          tasksToDraw.forEach(function(task, idx) {
+            const rowY = curY + idx * rowH;
+
+            // Row separator
+            ctx.strokeStyle = theme.lineColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(marginX + 50, rowY + rowH - 8);
+            ctx.lineTo(marginX + contentW - 50, rowY + rowH - 8);
+            ctx.stroke();
+
+            // Status Checkbox Box
+            const checkX = marginX + 70;
+            const checkY = rowY + 14;
+            const checkSize = 22;
+
+            if (task.completed) {
+              ctx.fillStyle = theme.accentSecondary;
+              drawRoundedRect(ctx, checkX, checkY, checkSize, checkSize, 6, true, false);
+              
+              ctx.strokeStyle = "#FFFFFF";
+              ctx.lineWidth = 2.8;
+              ctx.beginPath();
+              ctx.moveTo(checkX + 5, checkY + 11);
+              ctx.lineTo(checkX + 10, checkY + 16);
+              ctx.lineTo(checkX + 17, checkY + 6);
+              ctx.stroke();
+            } else {
+              ctx.strokeStyle = theme.textMuted;
+              ctx.lineWidth = 2;
+              drawRoundedRect(ctx, checkX, checkY, checkSize, checkSize, 6, false, true);
+            }
+
+            // Time Column
+            let textStartX = marginX + 140;
+            if (appState.options.showTimes) {
+              ctx.font = '600 14px ui-monospace, Menlo, monospace';
+              ctx.fillStyle = theme.textSecondary;
+              const timeStr = task.time || '—';
+              ctx.fillText(timeStr, marginX + 130, rowY + 30);
+              textStartX = marginX + 260;
+            }
+
+            // Priority Indicator Dot
+            let prioColor = theme.lowPriority;
+            if (task.priority === 'high') prioColor = theme.highPriority;
+            else if (task.priority === 'medium') prioColor = theme.medPriority;
+
+            if (task.priority && task.priority !== 'none') {
+              ctx.fillStyle = prioColor;
+              ctx.beginPath();
+              ctx.arc(textStartX - 14, rowY + 26, 4.5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+
+            // Task Title
+            ctx.font = task.completed ? '400 17px -apple-system, BlinkMacSystemFont, sans-serif' : '600 17px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.fillStyle = task.completed ? theme.textMuted : theme.textPrimary;
+            const maxTitleW = contentW - textStartX - (appState.options.showCategories ? 180 : 80);
+            const titleToDraw = truncateText(ctx, task.title, maxTitleW);
+            ctx.fillText(titleToDraw, textStartX, rowY + 30);
+
+            // Strikethrough if completed
+            if (task.completed) {
+              const strW = ctx.measureText(titleToDraw).width;
+              ctx.strokeStyle = theme.textMuted;
+              ctx.lineWidth = 1.5;
+              ctx.beginPath();
+              ctx.moveTo(textStartX, rowY + 24);
+              ctx.lineTo(textStartX + strW, rowY + 24);
+              ctx.stroke();
+            }
+
+            // Category Badge
+            if (appState.options.showCategories && task.category) {
+              const catW = 100;
+              const catX = marginX + contentW - 190;
+              const catY = rowY + 12;
+
+              ctx.fillStyle = theme.tagBg;
+              ctx.strokeStyle = theme.cardBorder;
+              ctx.lineWidth = 1;
+              drawRoundedRect(ctx, catX, catY, catW, 26, 13, true, true);
+
+              ctx.font = '600 12px -apple-system, BlinkMacSystemFont, sans-serif';
+              ctx.fillStyle = theme.textSecondary;
+              ctx.textAlign = 'center';
+              ctx.fillText(task.category, catX + catW / 2, catY + 17);
+              ctx.textAlign = 'left';
+            }
+          });
+
+          curY += tasksToDraw.length * rowH;
+        }
+
+        // 9. Notes & Reflections Section (If Enabled)
+        if (appState.options.showNotes && appState.notes && appState.notes.trim().length > 0) {
+          curY = Math.max(curY + 20, H - marginY - 240);
+          
+          ctx.font = '700 14px -apple-system, BlinkMacSystemFont, sans-serif';
+          ctx.fillStyle = theme.textMuted;
+          ctx.fillText("DAILY NOTES & REFLECTION", marginX + 60, curY);
+
+          curY += 12;
+          const notesH = 110;
+          ctx.fillStyle = theme.pageBg;
+          ctx.strokeStyle = theme.cardBorder;
+          ctx.lineWidth = 1.5;
+          drawRoundedRect(ctx, marginX + 50, curY, contentW - 100, notesH, 12, true, true);
+
+          ctx.font = '400 16px "Georgia", serif';
+          ctx.fillStyle = theme.textSecondary;
+          wrapText(ctx, appState.notes.trim(), marginX + 70, curY + 32, contentW - 140, 24);
+
+          curY += notesH + 16;
+        }
+
+        // 10. Footer Section
+        const footerY = H - marginY - 28;
+        ctx.strokeStyle = theme.lineColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(marginX + 50, footerY - 14);
+        ctx.lineTo(marginX + contentW - 50, footerY - 14);
+        ctx.stroke();
+
+        ctx.font = '500 12px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillStyle = theme.textMuted;
+        ctx.fillText("TASKCRAFT DAILY STUDIO • RE-UPLOAD THIS IMAGE TO EDIT AND ADD TASKS", marginX + 50, footerY + 6);
+
+        ctx.textAlign = 'right';
+        ctx.fillText("GENERATED ON " + formatShortDate(appState.date).toUpperCase(), marginX + contentW - 50, footerY + 6);
+        ctx.textAlign = 'left';
+
+        // 11. EMBED STEGANOGRAPHY MICRO-WATERMARK IN PIXELS
+        embedSteganography(ctx, W, H);
+
+        // 12. Copy to Display Canvas (scaled down for smooth visual display)
+        displayC.width = W / 2;
+        displayC.height = H / 2;
+        const dispCtx = displayC.getContext('2d');
+        dispCtx.drawImage(renderC, 0, 0, W, H, 0, 0, W / 2, H / 2);
+      }
+
+      // Helper: Draw Rounded Rectangles
+      function drawRoundedRect(ctx, x, y, width, height, radius, fill, stroke) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        if (fill) ctx.fill();
+        if (stroke) ctx.stroke();
+      }
+
+      function drawRoundedRectTop(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height);
+        ctx.lineTo(x, y + height);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function truncateText(ctx, text, maxWidth) {
+        if (ctx.measureText(text).width <= maxWidth) return text;
+        let str = text;
+        while (str.length > 0 && ctx.measureText(str + '…').width > maxWidth) {
+          str = str.slice(0, -1);
+        }
+        return str + '…';
+      }
+
+      function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        const words = text.split(' ');
+        let line = '';
+        let curY = y;
+        for (let n = 0; n < words.length; n++) {
+          const testLine = line + words[n] + ' ';
+          if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+            ctx.fillText(line, x, curY);
+            line = words[n] + ' ';
+            curY += lineHeight;
+            if (curY > y + lineHeight * 3) {
+              ctx.fillText(line + '…', x, curY);
+              return;
+            }
+          } else {
+            line = testLine;
+          }
+        }
+        ctx.fillText(line, x, curY);
+      }
+
+      // --- STEGANOGRAPHY & METADATA ENGINES ---
+      function embedSteganography(ctx, width, height) {
+        try {
+          const payload = JSON.stringify({
+            date: appState.date,
+            focus: appState.focus,
+            notes: appState.notes,
+            theme: appState.theme,
+            options: appState.options,
+            tasks: appState.tasks
+          });
+
+          const encoder = new TextEncoder();
+          const bytes = encoder.encode(payload);
+          const totalBytes = bytes.length;
+
+          const header = new Uint8Array(8);
+          header[0] = 0x54; header[1] = 0x41; header[2] = 0x53; header[3] = 0x4B; // 'TASK'
+          header[4] = (totalBytes >> 24) & 0xFF;
+          header[5] = (totalBytes >> 16) & 0xFF;
+          header[6] = (totalBytes >> 8) & 0xFF;
+          header[7] = totalBytes & 0xFF;
+
+          const fullData = new Uint8Array(8 + totalBytes);
+          fullData.set(header, 0);
+          fullData.set(bytes, 8);
+
+          const scanRows = 2;
+          const imgData = ctx.getImageData(0, height - scanRows, width, scanRows);
+          const px = imgData.data;
+
+          let byteIdx = 0;
+          for (let i = 0; i < px.length && byteIdx < fullData.length; i += 4) {
+            px[i] = fullData[byteIdx];
+            byteIdx++;
+          }
+
+          ctx.putImageData(imgData, 0, height - scanRows);
+        } catch (e) {
+          console.warn('Steganography embed warning', e);
+        }
+      }
+
+      function extractSteganographyFromImage(imgElement) {
+        return new Promise(function(resolve) {
+          try {
+            const c = document.createElement('canvas');
+            c.width = imgElement.naturalWidth || imgElement.width;
+            c.height = imgElement.naturalHeight || imgElement.height;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(imgElement, 0, 0);
+
+            const scanRows = 2;
+            const imgData = ctx.getImageData(0, c.height - scanRows, c.width, scanRows);
+            const px = imgData.data;
+
+            if (px[0] !== 0x54 || px[1] !== 0x41 || px[2] !== 0x53 || px[3] !== 0x4B) {
+              resolve(null);
+              return;
+            }
+
+            let rawBytes = [];
+            for (let i = 0; i < px.length; i += 4) {
+              rawBytes.push(px[i]);
+            }
+
+            const totalBytes = (rawBytes[4] << 24) | (rawBytes[5] << 16) | (rawBytes[6] << 8) | rawBytes[7];
+            if (totalBytes <= 0 || totalBytes > 500000 || totalBytes > rawBytes.length - 8) {
+              resolve(null);
+              return;
+            }
+
+            const payloadBytes = new Uint8Array(rawBytes.slice(8, 8 + totalBytes));
+            const decoder = new TextDecoder();
+            const jsonStr = decoder.decode(payloadBytes);
+            const parsed = JSON.parse(jsonStr);
+            resolve(parsed);
+          } catch (e) {
+            resolve(null);
+          }
+        });
+      }
+
+      function createPngWithMetadataBlob(canvas) {
+        return new Promise(function(resolve) {
+          canvas.toBlob(function(blob) {
+            if (!blob) {
+              resolve(null);
+              return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const buffer = e.target.result;
+              const bytes = new Uint8Array(buffer);
+
+              const payload = JSON.stringify({
+                date: appState.date,
+                focus: appState.focus,
+                notes: appState.notes,
+                theme: appState.theme,
+                options: appState.options,
+                tasks: appState.tasks
+              });
+
+              const keyword = "TaskCraftData";
+              const encoder = new TextEncoder();
+              const keyBytes = encoder.encode(keyword);
+              const dataBytes = encoder.encode(payload);
+
+              const chunkLen = keyBytes.length + 1 + dataBytes.length;
+              const chunkType = new Uint8Array([116, 69, 88, 116]); // 'tEXt'
+              
+              const chunkData = new Uint8Array(chunkLen);
+              chunkData.set(keyBytes, 0);
+              chunkData[keyBytes.length] = 0;
+              chunkData.set(dataBytes, keyBytes.length + 1);
+
+              const crc = calculateCrc32(chunkType, chunkData);
+
+              const chunkFull = new Uint8Array(4 + 4 + chunkLen + 4);
+              const view = new DataView(chunkFull.buffer);
+              view.setUint32(0, chunkLen, false);
+              chunkFull.set(chunkType, 4);
+              chunkFull.set(chunkData, 8);
+              view.setUint32(8 + chunkLen, crc, false);
+
+              let iendPos = -1;
+              for (let i = bytes.length - 12; i >= 8; i--) {
+                if (bytes[i] === 73 && bytes[i+1] === 69 && bytes[i+2] === 78 && bytes[i+3] === 68) {
+                  iendPos = i - 4;
+                  break;
+                }
+              }
+
+              let finalBytes;
+              if (iendPos > 0) {
+                const before = bytes.subarray(0, iendPos);
+                const after = bytes.subarray(iendPos);
+                finalBytes = new Uint8Array(before.length + chunkFull.length + after.length);
+                finalBytes.set(before, 0);
+                finalBytes.set(chunkFull, before.length);
+                finalBytes.set(after, before.length + chunkFull.length);
+              } else {
+                finalBytes = bytes;
+              }
+
+              // Append trailer marker
+              const trailerStr = "\n--TASKCRAFT_METADATA_START--\n" + btoa(unescape(encodeURIComponent(payload))) + "\n--TASKCRAFT_METADATA_END--\n";
+              const trailerBytes = encoder.encode(trailerStr);
+              
+              const completeWithTrailer = new Uint8Array(finalBytes.length + trailerBytes.length);
+              completeWithTrailer.set(finalBytes, 0);
+              completeWithTrailer.set(trailerBytes, finalBytes.length);
+
+              const newBlob = new Blob([completeWithTrailer], { type: 'image/png' });
+              resolve(newBlob);
+            };
+            reader.readAsArrayBuffer(blob);
+          }, 'image/png');
+        });
+      }
+
+      function calculateCrc32(typeBytes, dataBytes) {
+        let crcTable = window._crcTable;
+        if (!crcTable) {
+          crcTable = new Uint32Array(256);
+          for (let i = 0; i < 256; i++) {
+            let c = i;
+            for (let k = 0; k < 8; k++) {
+              c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+            }
+            crcTable[i] = c;
+          }
+          window._crcTable = crcTable;
+        }
+
+        let crc = 0xFFFFFFFF;
+        for (let i = 0; i < typeBytes.length; i++) {
+          crc = crcTable[(crc ^ typeBytes[i]) & 0xFF] ^ (crc >>> 8);
+        }
+        for (let i = 0; i < dataBytes.length; i++) {
+          crc = crcTable[(crc ^ dataBytes[i]) & 0xFF] ^ (crc >>> 8);
+        }
+        return (crc ^ 0xFFFFFFFF) >>> 0;
+      }
+
+      function extractMetadataFromArrayBuffer(buffer) {
+        try {
+          const bytes = new Uint8Array(buffer);
+
+          // 1. Scan PNG chunks
+          if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) {
+            let offset = 8;
+            const view = new DataView(buffer);
+            while (offset + 8 <= bytes.length) {
+              const chunkLen = view.getUint32(offset, false);
+              const chunkType = String.fromCharCode(bytes[offset+4], bytes[offset+5], bytes[offset+6], bytes[offset+7]);
+              
+              if (chunkType === 'tEXt' || chunkType === 'iTXt') {
+                const chunkData = bytes.subarray(offset + 8, offset + 8 + chunkLen);
+                let nullIdx = -1;
+                for (let k = 0; k < chunkData.length; k++) {
+                  if (chunkData[k] === 0) { nullIdx = k; break; }
+                }
+                if (nullIdx !== -1) {
+                  const decoder = new TextDecoder();
+                  const keyword = decoder.decode(chunkData.subarray(0, nullIdx));
+                  if (keyword === 'TaskCraftData' || keyword === 'TaskFlowData' || keyword === 'TaskData') {
+                    const text = decoder.decode(chunkData.subarray(nullIdx + 1));
+                    return JSON.parse(text);
+                  }
+                }
+              }
+
+              offset += 8 + chunkLen + 4;
+              if (chunkType === 'IEND') break;
+            }
+          }
+
+          // 2. Scan binary trailer
+          const decoder = new TextDecoder('latin1');
+          const fullStr = decoder.decode(bytes);
+          const startMarker = "--TASKCRAFT_METADATA_START--\n";
+          const endMarker = "\n--TASKCRAFT_METADATA_END--";
+          const sIdx = fullStr.indexOf(startMarker);
+          if (sIdx !== -1) {
+            const eIdx = fullStr.indexOf(endMarker, sIdx);
+            if (eIdx !== -1) {
+              const base64Str = fullStr.substring(sIdx + startMarker.length, eIdx).trim();
+              const jsonStr = decodeURIComponent(escape(atob(base64Str)));
+              return JSON.parse(jsonStr);
+            }
+          }
+        } catch (e) {
+          console.warn('Metadata chunk extraction notice', e);
+        }
+        return null;
+      }
+
+      // --- UPLOAD & TASK RESTORATION PIPELINE ---
+      async function handleUploadedImageFile(file) {
+        if (!file) return;
+
+        showToast('Processing "' + file.name + '"...', 'info');
+
+        const buffer = await file.arrayBuffer();
+        let extractedData = extractMetadataFromArrayBuffer(buffer);
+
+        if (!extractedData) {
+          const dataUrl = await new Promise(function(resolve) {
+            const r = new FileReader();
+            r.onload = function(e) { resolve(e.target.result); };
+            r.readAsDataURL(file);
+          });
+
+          const img = new Image();
+          await new Promise(function(resolve, reject) {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = dataUrl;
+          });
+
+          extractedData = await extractSteganographyFromImage(img);
+        }
+
+        if (extractedData && (extractedData.tasks || extractedData.date)) {
+          appState.date = extractedData.date || appState.date;
+          appState.focus = extractedData.focus || '';
+          appState.notes = extractedData.notes || '';
+          if (extractedData.theme && THEMES[extractedData.theme]) {
+            appState.theme = extractedData.theme;
+          }
+          if (extractedData.options) {
+            appState.options = Object.assign({}, appState.options, extractedData.options);
+          }
+          if (Array.isArray(extractedData.tasks)) {
+            appState.tasks = extractedData.tasks;
+          }
+
+          const count = appState.tasks.length;
+          const dateStr = formatShortDate(appState.date);
+          elements.restoreBannerText.textContent = '✨ Successfully restored ' + count + ' task' + (count === 1 ? '' : 's') + ' from ' + dateStr + ' page! You can now edit any task, add new ones, and regenerate.';
+          elements.restoreBanner.classList.add('active');
+
+          showToast('Restored ' + count + ' tasks from ' + dateStr + ' page!', 'success');
+          renderAll();
+        } else {
+          showToast('Image uploaded, but no TaskCraft embedded data found. Use this page to create your task list!', 'warning');
+        }
+      }
+
+      // --- GENERATE & EXPORT HANDLER ---
+      async function handleDownloadImage() {
+        showToast('Rendering high-res daily page image...', 'info');
+        
+        renderPageCanvas();
+
+        const blob = await createPngWithMetadataBlob(elements.renderCanvas);
+        if (!blob) {
+          showToast('Image generation failed', 'warning');
+          return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const filename = 'Daily_Tasks_' + (appState.date || 'list') + '.png';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 4000);
+
+        showToast('Downloaded "' + filename + '" with embedded task data!', 'success');
+      }
+
+      async function handleOpenExportModal() {
+        renderPageCanvas();
+        const blob = await createPngWithMetadataBlob(elements.renderCanvas);
+        if (!blob) return;
+
+        const url = URL.createObjectURL(blob);
+        elements.modalPreviewImg.src = url;
+        elements.exportModal.classList.add('active');
+      }
+
+      async function handleCopyImage() {
+        try {
+          if (!navigator.clipboard || !window.ClipboardItem) {
+            showToast('Clipboard image copy not supported in this browser. Please use Download.', 'warning');
+            return;
+          }
+
+          renderPageCanvas();
+          elements.renderCanvas.toBlob(async function(blob) {
+            if (!blob) return;
+            try {
+              await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+              showToast('✨ High-res task page copied to clipboard!', 'success');
+            } catch (err) {
+              showToast('Could not copy to clipboard. Please download instead.', 'warning');
+            }
+          }, 'image/png');
+        } catch (e) {
+          showToast('Could not copy image.', 'warning');
+        }
+      }
+
+      // --- EVENT LISTENERS SETUP ---
+      function setupEventListeners() {
+        elements.taskDateInput.addEventListener('change', function() {
+          appState.date = elements.taskDateInput.value;
+          renderAll();
+        });
+
+        document.querySelectorAll('.chip-btn').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            document.querySelectorAll('.chip-btn').forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+
+            const now = new Date();
+            if (btn.dataset.date === 'today') {
+              appState.date = getTodayDateString();
+            } else if (btn.dataset.date === 'tomorrow') {
+              now.setDate(now.getDate() + 1);
+              appState.date = now.toISOString().split('T')[0];
+            } else if (btn.dataset.date === 'plus2') {
+              now.setDate(now.getDate() + 2);
+              appState.date = now.toISOString().split('T')[0];
+            }
+            renderAll();
+          });
+        });
+
+        elements.dailyFocusInput.addEventListener('input', function() {
+          appState.focus = elements.dailyFocusInput.value;
+          renderPageCanvas();
+          persistState();
+        });
+
+        elements.dailyNotesInput.addEventListener('input', function() {
+          appState.notes = elements.dailyNotesInput.value;
+          renderPageCanvas();
+          persistState();
+        });
+
+        function submitNewTask() {
+          const title = elements.newTaskTitleInput.value.trim();
+          if (!title) {
+            elements.newTaskTitleInput.focus();
+            return;
+          }
+
+          const newTask = {
+            id: 't_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            title: title,
+            priority: elements.newTaskPriority.value,
+            category: elements.newTaskCategory.value,
+            time: elements.newTaskTime.value.trim(),
+            completed: false
+          };
+
+          appState.tasks.unshift(newTask);
+          elements.newTaskTitleInput.value = '';
+          elements.newTaskTime.value = '';
+          showToast('Task added!', 'success');
+          renderAll();
+          elements.newTaskTitleInput.focus();
+        }
+
+        elements.btnAddTask.addEventListener('click', submitNewTask);
+        elements.newTaskTitleInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') submitNewTask();
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            appState.currentFilter = btn.dataset.filter;
+            renderTaskList();
+          });
+        });
+
+        document.querySelectorAll('.theme-card').forEach(function(card) {
+          card.addEventListener('click', function() {
+            appState.theme = card.dataset.themeName;
+            renderAll();
+          });
+        });
+
+        elements.optShowTimes.addEventListener('change', function() {
+          appState.options.showTimes = elements.optShowTimes.checked;
+          renderAll();
+        });
+        elements.optShowCategories.addEventListener('change', function() {
+          appState.options.showCategories = elements.optShowCategories.checked;
+          renderAll();
+        });
+        elements.optShowNotes.addEventListener('change', function() {
+          appState.options.showNotes = elements.optShowNotes.checked;
+          renderAll();
+        });
+        elements.optShowProgress.addEventListener('change', function() {
+          appState.options.showProgress = elements.optShowProgress.checked;
+          renderAll();
+        });
+
+        elements.uploadDropZone.addEventListener('dragover', function(e) {
+          e.preventDefault();
+          elements.uploadDropZone.classList.add('dragover');
+        });
+        elements.uploadDropZone.addEventListener('dragleave', function() {
+          elements.uploadDropZone.classList.remove('dragover');
+        });
+        elements.uploadDropZone.addEventListener('drop', function(e) {
+          e.preventDefault();
+          elements.uploadDropZone.classList.remove('dragover');
+          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleUploadedImageFile(e.dataTransfer.files[0]);
+          }
+        });
+        elements.imageFileInput.addEventListener('change', function() {
+          if (elements.imageFileInput.files && elements.imageFileInput.files[0]) {
+            handleUploadedImageFile(elements.imageFileInput.files[0]);
+          }
+        });
+
+        elements.dismissRestoreBannerBtn.addEventListener('click', function() {
+          elements.restoreBanner.classList.remove('active');
+        });
+
+        elements.btnDownloadImage.addEventListener('click', handleDownloadImage);
+        elements.btnQuickExportNav.addEventListener('click', handleOpenExportModal);
+        elements.btnCopyImage.addEventListener('click', handleCopyImage);
+        elements.btnPrintPage.addEventListener('click', function() { window.print(); });
+
+        elements.btnLoadSample.addEventListener('click', function() {
+          appState.date = getTodayDateString();
+          appState.focus = "Launch product milestone and prioritize high-impact deep work";
+          appState.notes = "Keep meetings under 25 minutes. Reward completion of afternoon review with coffee.";
+          appState.tasks = [
+            { id: "s1", title: "Review technical architecture for image steganography module", priority: "high", category: "Work", time: "09:00 AM", completed: true },
+            { id: "s2", title: "Finalize client proposal deck and executive summary", priority: "high", category: "Work", time: "11:30 AM", completed: true },
+            { id: "s3", title: "Team sync & design critique on daily planner UI", priority: "medium", category: "Work", time: "02:00 PM", completed: false },
+            { id: "s4", title: "Review personal portfolio & investment balancing", priority: "medium", category: "Finance", time: "04:30 PM", completed: false },
+            { id: "s5", title: "Outdoor 5K run and breathwork recovery", priority: "low", category: "Health", time: "06:00 PM", completed: false },
+            { id: "s6", title: "Read Chapter 4 of Pragmatic Programmer", priority: "low", category: "Learning", time: "09:00 PM", completed: false }
+          ];
+          showToast('Sample daily task list loaded!', 'success');
+          renderAll();
+        });
+
+        elements.btnResetList.addEventListener('click', function() {
+          if (confirm('Start a fresh daily task list? Current tasks will be cleared.')) {
+            appState.tasks = [];
+            appState.focus = '';
+            appState.notes = '';
+            showToast('Daily list cleared', 'info');
+            renderAll();
+          }
+        });
+
+        elements.themeToggleBtn.addEventListener('click', function() {
+          const isDark = document.body.getAttribute('data-theme') === 'dark';
+          if (isDark) {
+            document.body.removeAttribute('data-theme');
+            showToast('Light mode active', 'info');
+          } else {
+            document.body.setAttribute('data-theme', 'dark');
+            showToast('Dark mode active', 'info');
+          }
+        });
+
+        elements.tabBtnEditor.addEventListener('click', function() {
+          elements.tabBtnEditor.classList.add('active');
+          elements.tabBtnPreview.classList.remove('active');
+          elements.editorPanel.classList.remove('mobile-hide-editor');
+          elements.previewPanel.classList.add('mobile-hide-preview');
+        });
+
+        elements.tabBtnPreview.addEventListener('click', function() {
+          elements.tabBtnPreview.classList.add('active');
+          elements.tabBtnEditor.classList.remove('active');
+          elements.editorPanel.classList.add('mobile-hide-editor');
+          elements.previewPanel.classList.remove('mobile-hide-preview');
+          renderPageCanvas();
+        });
+
+        elements.btnCloseModal.addEventListener('click', function() { elements.exportModal.classList.remove('active'); });
+        elements.btnModalClose.addEventListener('click', function() { elements.exportModal.classList.remove('active'); });
+        elements.btnModalDownload.addEventListener('click', function() {
+          handleDownloadImage();
+          elements.exportModal.classList.remove('active');
+        });
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
